@@ -1,0 +1,14 @@
+# Raw captures and full-resolution stills stay off the web build
+captures/
+stills/
+tiles/
+# Capture and build pipeline, not needed at runtime
+*.py
+*.sh
+*.tsv
+*.kml
+*.log
+*.command
+sv_frame.html
+Camera-edited.jpg
+.DS_Store
