@@ -341,6 +341,14 @@
     // a story stop: lift off (the picture fades away as the camera climbs), fly, land on the aerial view
     renderPanel(s); setPanel(true);
     hideStill(700);
+    // Leaving the intro, the camera is 20,000 km out and the first site is 900 m up, so a single
+    // flight covers five orders of magnitude and reads as a lurch. Approach in two moves instead:
+    // cross to a continental altitude over the site first, then make the ordinary descent.
+    if (prev && prev.kind === 'intro' && s.lookat) {
+      const approach = lookAtToCamera({ lon: s.lookat.lon, lat: s.lookat.lat, range: 1.4e6, heading: 0, tilt: 0 });
+      const okApproach = await fly(approach, 3.4 * (CFG.flight || 1), C.EasingFunction.QUADRATIC_OUT);
+      if (!okApproach || my !== seq) return;
+    }
     const ok = await fly(lookAtToCamera(s.lookat));
     if (!ok || my !== seq) return;
     const nxt = stops[cur + 1]; if (nxt && nxt.still) load(stillUrl(nxt));   // warm the ground picture

@@ -284,6 +284,7 @@
   }
 
   function go(i) {
+    const prev = stops[cur];
     cur = Math.max(0, Math.min(stops.length - 1, i));
     const s = stops[cur];
     $('count').textContent = (cur + 1) + '/' + stops.length;
@@ -301,7 +302,13 @@
       renderPanel(s);
       $('panel').classList.remove('hidden'); $('attrib').classList.add('shift'); $('zoom').classList.add('shift');
       chip.classList.remove('show');
-      if (s.lookat) fly(lookAtToCamera(s.lookat));
+      // leaving the intro, cross to a continental altitude over the site before the close descent,
+      // so the first flight is not a single drop from 20,000 km to a few hundred metres
+      if (s.lookat && prev && prev.kind === 'intro') {
+        const hop = 3.4 * (CFG.flight || 1);
+        fly(lookAtToCamera({ lon: s.lookat.lon, lat: s.lookat.lat, range: 1.4e6, heading: 0, tilt: 0 }), hop);
+        setTimeout(() => { if (stops[cur] === s) fly(lookAtToCamera(s.lookat)); }, hop * 1000);
+      } else if (s.lookat) fly(lookAtToCamera(s.lookat));
     } else {
       $('panel').classList.add('hidden'); $('attrib').classList.remove('shift'); $('zoom').classList.remove('shift');
       chip.textContent = (s.for || '') + ': street level. The original drops into Google Street View here; this is a stand-in view.';
